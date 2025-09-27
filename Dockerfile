@@ -13,10 +13,10 @@ RUN npm run build
 # ============================
 # Stage 2: Setup Rails backend
 # ============================
-FROM ruby:3.2 AS build-backend
+FROM ruby:3.2.3 AS build-backend
 WORKDIR /app/backend
 
-# Install required packages, yarn, MySQL client dev
+# Install required packages, Yarn, MySQL client dev
 RUN apt-get update -qq && apt-get install -y \
     nodejs \
     curl \
@@ -26,8 +26,8 @@ RUN apt-get update -qq && apt-get install -y \
     libssl-dev \
     libreadline-dev \
     zlib1g-dev \
-    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarnkey.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | tee /etc/apt/sources.list.d/yarn.list \
     && apt-get update && apt-get install -y yarn \
     && rm -rf /var/lib/apt/lists/*
 
