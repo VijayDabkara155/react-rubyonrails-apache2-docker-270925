@@ -1,0 +1,57 @@
+services:
+  frontend:
+    build:
+      context: .
+      target: build-frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./project/frontend:/app/frontend
+    stdin_open: true
+    tty: true
+
+  backend:
+    build:
+      context: .
+      target: build-backend
+    container_name: backend
+    command: bundle exec rails s -b 0.0.0.0 -p 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./project/backend:/app/backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: myapp_development
+
+  apache:
+    build:
+      context: .
+      target: apache
+    container_name: apache
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:8.0
+    container_name: db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: myapp_development
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+
